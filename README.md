@@ -1,7 +1,7 @@
 JoysoundJLP
 ===========
 
-言語解析WebAPI(https://5jcup.org/awards/joysound-lang-api)を利用するためのラッパーライブラリ。
+言語解析WebAPI(https://5jcup.org/awards/joysound-lang-api/)を利用するためのラッパーライブラリ。
 
 ## Requirements
 * jQuery
