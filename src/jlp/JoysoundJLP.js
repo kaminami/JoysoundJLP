@@ -127,6 +127,10 @@ var JoysoundJLP;
             return this.rawPhrase.hashtag;
         };
 
+        Sentence.prototype.topics = function () {
+            return this.rawPhrase.topics;
+        };
+
         Sentence.prototype.reading = function () {
             var buffer = [];
             this.phrases().forEach(function (eachPhrase) {
