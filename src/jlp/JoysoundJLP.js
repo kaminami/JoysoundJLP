@@ -115,7 +115,7 @@ var JoysoundJLP;
             return this.rawPhrase.reply;
         };
 
-        Sentence.prototype.mentionedUser = function () {
+        Sentence.prototype.mentionedUsers = function () {
             return this.rawPhrase.mention;
         };
 
@@ -204,7 +204,7 @@ var JoysoundJLP;
             return this.rawPhrase.pair_phrase_pn == 0;
         };
 
-        Phrase.prototype.modality = function () {
+        Phrase.prototype.modalities = function () {
             return this.rawPhrase.modality;
         };
 
