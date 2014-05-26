@@ -66,6 +66,18 @@ var JoysoundJLP;
             return readings;
         };
 
+        ResultSet.prototype.first = function () {
+            return this.sentences()[0];
+        };
+
+        ResultSet.prototype.second = function () {
+            return this.sentences()[1];
+        };
+
+        ResultSet.prototype.third = function () {
+            return this.sentences()[2];
+        };
+
         return ResultSet;
     })();
     JoysoundJLP.ResultSet = ResultSet;
