@@ -1,7 +1,7 @@
 JoysoundJLP
 ===========
 
-Œ¾Œê‰ğÍWebAPI (https://5jcup.org/awards/joysound-lang-api/) ‚ğ—˜—p‚·‚é‚½‚ß‚Ìƒ‰ƒbƒp[ƒ‰ƒCƒuƒ‰ƒŠB
+è¨€èªè§£æWebAPI (https://5jcup.org/awards/joysound-lang-api/) ã‚’åˆ©ç”¨ã™ã‚‹ãŸã‚ã®ãƒ©ãƒƒãƒ‘ãƒ¼ãƒ©ã‚¤ãƒ–ãƒ©ãƒªã€‚
 
 ## Requirements
 * jQuery
@@ -12,11 +12,17 @@ JoysoundJLP
 var config = new JoysoundJLP.Config('YOUR_USERNAME', 'YOUR_PASSWORD');
 
 var tagger = new JoysoundJLP.Tagger(config);
-var sentence = '–{“ú‚ÌŒõ‚è•¨‚É‚È‚è‚Ü‚·B¡“ú‚ÍA‚¨‚·‚µ‚ğH‚×‚½‚¢B‚È‚ñ‚ÄƒuƒŠƒŠƒAƒ“ƒg‚ÈƒRƒnƒ_B';
-tagger.parse(sentence, function(resultSet) {
-    console.log(sentence);
+var sourceSentence = 'æœ¬æ—¥ã®å…‰ã‚Šç‰©ã«ãªã‚Šã¾ã™ã€‚ä»Šæ—¥ã¯ã€ãŠã™ã—ã‚’é£Ÿã¹ãŸã„ã€‚ãªã‚“ã¦ãƒ–ãƒªãƒªã‚¢ãƒ³ãƒˆãªã‚³ãƒãƒ€ã€‚';
+tagger.parse(sourceSentence, function(resultSet) {
+    console.log(sourceSentence);
     console.log(resultSet);
     console.log(resultSet.readings());
+    
+    resultSet.sentences().forEach(function(eachSentence) {
+        eachSentence.eachWord(function (eachWord) {
+            console.log(eachWord.printString())
+        });
+    });
 });
 ```
 
