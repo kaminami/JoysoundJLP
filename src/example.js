@@ -8,6 +8,12 @@ window.onload = function() {
             console.log(sentence);
             console.log(resultSet);
             console.log(resultSet.readings());
+
+            resultSet.sentences().forEach(function(eachSentence) {
+                eachSentence.eachWord(function (eachWord) {
+                    console.log(eachWord.printString())
+                });
+            });
         });
     };
 

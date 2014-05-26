@@ -139,6 +139,20 @@ var JoysoundJLP;
             return buffer.join('');
         };
 
+        Sentence.prototype.eachPhrase = function (callbackFunction) {
+            this.phrases().forEach(function (each) {
+                callbackFunction(each);
+            });
+        };
+
+        Sentence.prototype.eachWord = function (callbackFunction) {
+            this.eachPhrase(function (eachPhrase) {
+                eachPhrase.eachWord(function(eachWord){
+                    callbackFunction(eachWord);
+                });
+            });
+        };
+
         return Sentence;
     })();
     JoysoundJLP.Sentence = Sentence;
@@ -221,6 +235,11 @@ var JoysoundJLP;
             return buffer.join('');
         };
 
+        Phrase.prototype.eachWord = function (callbackFunction) {
+            this.words().forEach(function (each) {
+                callbackFunction(each);
+            });
+        };
         return Phrase;
     })();
     JoysoundJLP.Phrase = Phrase;
@@ -253,9 +272,9 @@ var JoysoundJLP;
 
         Word.prototype.attribute = function () {
             switch (this.rawWord.attr) {
-                case 0: return '接頭辞';
-                case 1: return '自立語';
-                case 2: return '付属語';
+                case '0': return '接頭辞';
+                case '1': return '自立語';
+                case '2': return '付属語';
             }
             return 'Unknown';
         };
@@ -266,6 +285,19 @@ var JoysoundJLP;
 
         Word.prototype.reading = function () {
             return this.rawWord.reading;
+        };
+
+        Word.prototype.printString = function () {
+            var buf = [];
+            buf.push(this.word());
+            buf.push(this.base());
+            buf.push(this.startPosition());
+            buf.push(this.byteLength());
+            buf.push(this.attribute());
+            buf.push(this.partsOfSpeech());
+            buf.push(this.reading());
+
+            return 'a Word (' + buf.join(', ') + ')';
         };
 
         return Word;
