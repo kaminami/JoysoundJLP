@@ -3,7 +3,7 @@ window.onload = function() {
         $("#example01-tw").empty();
         $("#example01-words").empty();
 
-        var twmodeEnabled = $("#example01Button-tw_mode:checked").val();
+        var twmodeEnabled = $("#example01-tw_mode:checked").val();
         var sourceSentence = $("#example01-input").val().trim();
 
         var config = new JoysoundJLP.Config('YOUR_USERNAME', 'YOUR_PASSWORD');
