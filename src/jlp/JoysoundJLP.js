@@ -108,39 +108,39 @@ var JoysoundJLP;
         };
 
         Sentence.prototype.isPositive = function () {
-            return this.rawPhrase.sent_pn == 1;
+            return this.rawSentence.sent_pn == 1;
         };
 
         Sentence.prototype.isNegative = function () {
-            return this.rawPhrase.sent_pn == 2;
+            return this.rawSentence.sent_pn == 2;
         };
 
         Sentence.prototype.isNeautral = function () {
-            return this.rawPhrase.sent_pn == 0;
+            return this.rawSentence.sent_pn == 0;
         };
 
         Sentence.prototype.publicRetweetedUser = function () {
-            return this.rawPhrase.pubrt;
+            return this.rawSentence.pubrt;
         };
 
         Sentence.prototype.repliedUser = function () {
-            return this.rawPhrase.reply;
+            return this.rawSentence.reply;
         };
 
         Sentence.prototype.mentionedUsers = function () {
-            return this.rawPhrase.mention;
+            return this.rawSentence.mention;
         };
 
         Sentence.prototype.containedUrls = function () {
-            return this.rawPhrase.url;
+            return this.rawSentence.url;
         };
 
         Sentence.prototype.hashtags = function () {
-            return this.rawPhrase.hashtag;
+            return this.rawSentence.hashtag;
         };
 
         Sentence.prototype.topics = function () {
-            return this.rawPhrase.topics;
+            return this.rawSentence.topics;
         };
 
         Sentence.prototype.reading = function () {
@@ -352,7 +352,6 @@ var JoysoundJLP;
             var self = this;
 
             var url = this.requestUrl(sentence);
-            console.log(url);
             $.ajax({
                 type: 'GET',
                 url: url,
