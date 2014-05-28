@@ -11,7 +11,7 @@ var JoysoundJLP;
             this.apiPath = 'webapis/synana/1/index.php';
         };
 
-        Config.prototype.beTwitterMode = function () {
+        Config.prototype.beTweetMode = function () {
             this.mode = 'tw_mode';
         };
 
