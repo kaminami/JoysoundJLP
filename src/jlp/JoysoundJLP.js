@@ -338,11 +338,13 @@ var JoysoundJLP;
 
         Tagger.prototype.requestUrl = function (sentence) {
             var encodedSentence = encodeURI(sentence);
-            var url = this.config.requestUrl() + '?sent=' + encodedSentence;
-
+            var url = this.config.requestUrl() + '?';
             if (this.config.hasMode()) {
-                url = url + '&mode=' + this.config.mode;
+                url = url + 'mode=' + this.config.mode + '&';
             }
+
+            url = url + 'sent=' + encodedSentence;
+
             return url;
         };
 
