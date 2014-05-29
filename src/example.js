@@ -1,5 +1,5 @@
 window.onload = function() {
-    document.getElementById('example01Button').onclick = function (event) {
+    document.getElementById('example01Button').onclick = function(event) {
         $("#example01-tw").empty();
         $("#example01-words").empty();
 
@@ -29,11 +29,11 @@ window.onload = function() {
             });
         });
 
-        var addItemToTw = function (key, value) {
+        var addItemToTw = function(key, value) {
             $("#example01-tw").append($("<li>").text(key + ': ' + value).append($("</li>")));
         }
 
-        var addItemToWords = function (value) {
+        var addItemToWords = function(value) {
             $("#example01-words").append($("<li>").text(value).append($("</li>")));
         }
     };
