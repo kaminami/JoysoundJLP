@@ -165,6 +165,28 @@ var JoysoundJLP;
             });
         };
 
+        Sentence.prototype.dependencies = function(callbackFunction) {
+            var self = this;
+            var result = [];
+
+            this.eachPhrase(function(eachPhrase) {
+                result.push([eachPhrase, self.phraseAt(eachPhrase.dependPhrase())]);
+            });
+
+            return result;
+        };
+
+        Sentence.prototype.phraseAt = function(phraseId) {
+            for (var i = 0; i < this.phraseArray.length; i++) {
+                var eachPhrase = this.phraseArray[i];
+
+                if (eachPhrase.id() == phraseId) {
+                    return eachPhrase;
+                }
+            }
+            return null;
+        };
+
         return Sentence;
     })();
     JoysoundJLP.Sentence = Sentence;
@@ -240,7 +262,7 @@ var JoysoundJLP;
 
         Phrase.prototype.reading = function() {
             var buffer = [];
-            this.words().forEach(function(eachWord) {
+            this.eachWord(function(eachWord) {
                 buffer.push(eachWord.reading());
             });
             buffer.push(' ');
@@ -252,6 +274,37 @@ var JoysoundJLP;
                 callbackFunction(each);
             });
         };
+
+        Phrase.prototype.eachPhraseWord = function(callbackFunction) {
+            this.phraseWords().forEach(function(each) {
+                callbackFunction(each);
+            });
+        };
+
+        Phrase.prototype.posinegaString = function() {
+            if (this.isPositive()) { return 'positive'; }
+            if (this.isNegative()) { return 'negative'; }
+            if (this.isNeautral()) { return 'neautral'; }
+            return '';
+        };
+
+        Phrase.prototype.printString = function() {
+            var baseBuf = []
+            this.eachWord(function(each) {
+                baseBuf.push(each.word());
+            })
+
+            var buf = [];
+            buf.push(baseBuf.join(''));
+            buf.push(this.posinegaString());
+            buf.push(this.id());
+            buf.push(this.dependPhrase());
+            buf.push(this.modalities());
+            buf.push(this.reading());
+
+            return 'a Phrase (' + buf.join(', ') + ')';
+        };
+
         return Phrase;
     })();
     JoysoundJLP.Phrase = Phrase;

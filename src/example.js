@@ -13,6 +13,8 @@ window.onload = function() {
 
         tagger.parse(sourceSentence, function(resultSet) {
             var sentence = resultSet.first();
+            console.log(sentence);
+            console.log(sentence.dependencies())
 
             $("#example01-reading").text(sentence.reading());
 
