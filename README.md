@@ -3,7 +3,7 @@ JoysoundJLP
 
 言語解析WebAPI (https://5jcup.org/awards/joysound-lang-api/) を利用するためのラッパーライブラリ。
 
-※2014/11/11現在、WebAPIが変更されています。本ライブラリは満足に動作しません。
+※2014/11/11現在、WebAPIは更新されています。本ライブラリは満足に動作しません。
 https://lr.capio.jp/services/webapis/
 
 ## Requirements
