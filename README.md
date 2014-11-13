@@ -13,14 +13,16 @@ var config = new JoysoundJLP.Config('!!!YOUR_ACCESSKEY!!!');
 var analyzer = new JoysoundJLP.Analyzer(config);
         
 var sourceSentence = "今日はいい天気だ";
-// きょうはいいてんきだ
 
 analyzer.analyze(sourceSentence, function(resultSet) {
     console.log(sourceSentence);
     console.log(resultSet);
 
     var result = resultSet.results()[0];
+    console.log(result.impression());
+// ポジティブ
     console.log(result.yomi());
+// きょうはいいてんきだ
 
     result.eachMorpheme(function(each) {
         console.log(each.printString())
