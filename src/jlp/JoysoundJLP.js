@@ -1,14 +1,9 @@
 var JoysoundJLP;
 (function(JoysoundJLP) {
     var Config = (function() {
-        function Config(usernameStr, passwordStr) {
-            this.username = usernameStr;
-            this.password = passwordStr;
-
+        function Config(accessKey) {
+            this.accessKey = accessKey;
             this.mode = undefined;
-
-            this.host = 'event.capio.jp';
-            this.apiPath = 'webapis/synana/1/index.php';
         };
 
         Config.prototype.beTweetMode = function() {
@@ -20,11 +15,7 @@ var JoysoundJLP;
         };
 
         Config.prototype.requestUrl = function() {
-            return 'http://' + this.keyForBasicAuth() + '@' + this.host + '/' + this.apiPath;
-        };
-
-        Config.prototype.keyForBasicAuth = function() {
-            return this.username + ':' + this.password;
+            return 'https://lr.capio.jp/webapis/iminos/synana_k/1_1?acckey=' + this.accessKey + '&';
         };
 
         return Config;
@@ -36,7 +27,7 @@ var JoysoundJLP;
         function ResultSet(rawResult, config) {
             this.rawResult = rawResult;
             this.config = config;
-            this.sentenceArray = [];
+            this.resultArray = [];
 
             this.parse(rawResult);
 
@@ -44,38 +35,18 @@ var JoysoundJLP;
 
         ResultSet.prototype.parse = function(rawResult) {
             var self = this;
-            rawResult.result.forEach(function(eachRawSentence) {
-                var sentence = new Sentence(eachRawSentence);
-                self.sentenceArray.push(sentence)
+            rawResult.results.forEach(function(eachRawResult) {
+                var sentence = new Result(eachRawResult);
+                self.resultArray.push(sentence)
             });
         };
 
-        ResultSet.prototype.sentences = function() {
-            return this.sentenceArray;
+        ResultSet.prototype.results = function() {
+            return this.resultArray;
         };
 
-        ResultSet.prototype.errorCode = function() {
-            return this.rawResult.error_code;
-        };
-
-        ResultSet.prototype.readings = function() {
-            var readings = [];
-            this.sentences().forEach(function(eachSentence) {
-                readings.push(eachSentence.reading());
-            });
-            return readings;
-        };
-
-        ResultSet.prototype.first = function() {
-            return this.sentences()[0];
-        };
-
-        ResultSet.prototype.second = function() {
-            return this.sentences()[1];
-        };
-
-        ResultSet.prototype.third = function() {
-            return this.sentences()[2];
+        ResultSet.prototype.apierr = function() {
+            return this.rawResult.apierr;
         };
 
         return ResultSet;
@@ -83,100 +54,115 @@ var JoysoundJLP;
     JoysoundJLP.ResultSet = ResultSet;
 
 
-    var Sentence = (function() {
-        function Sentence(rawSentence) {
-            this.rawSentence = rawSentence;
+    var Result = (function() {
+        function Result(rawResult) {
+            this.rawResult = rawResult;
             this.phraseArray = [];
+            this.morphemeArray = [];
 
-            this.parse(rawSentence)
+            this.parse(rawResult)
         };
 
-        Sentence.prototype.parse = function(rawSentence) {
+        Result.prototype.parse = function(rawResult) {
             var self = this;
-            rawSentence.phrases.forEach(function(eachRawPhrase) {
+            rawResult.phrases.forEach(function(eachRawPhrase) {
                 var phrase = new Phrase(eachRawPhrase);
                 self.phraseArray.push(phrase)
             });
+
+            rawResult.morphemes.forEach(function(eachRawMorpheme) {
+                var morpheme = new Morpheme(eachRawMorpheme);
+                self.morphemeArray.push(morpheme)
+            });
         };
 
-        Sentence.prototype.phrases = function() {
+        Result.prototype.phrases = function() {
             return this.phraseArray;
         };
 
-        Sentence.prototype.errorCode = function() {
-            return this.rawSentence.ana_error_code;
+        Result.prototype.morphemes = function() {
+            return this.morphemeArray;
         };
 
-        Sentence.prototype.isPositive = function() {
-            return this.rawSentence.sent_pn == 1;
+        Result.prototype.err = function() {
+            return this.rawResult.err;
         };
 
-        Sentence.prototype.isNegative = function() {
-            return this.rawSentence.sent_pn == 2;
+        Result.prototype.spn = function() {
+            return this.rawResult.spn;
         };
 
-        Sentence.prototype.isNeautral = function() {
-            return this.rawSentence.sent_pn == 0;
+        Result.prototype.pubrt = function() {
+            return this.rawResult.pubrt;
         };
 
-        Sentence.prototype.publicRetweetedUser = function() {
-            return this.rawSentence.pubrt;
+        Result.prototype.reply = function() {
+            return this.rawResult.reply;
         };
 
-        Sentence.prototype.repliedUser = function() {
-            return this.rawSentence.reply;
+        Result.prototype.mention = function() {
+            return this.rawResult.mention;
         };
 
-        Sentence.prototype.mentionedUsers = function() {
-            return this.rawSentence.mention;
+        Result.prototype.url = function() {
+            return this.rawResult.url;
         };
 
-        Sentence.prototype.containedUrls = function() {
-            return this.rawSentence.url;
+        Result.prototype.hashtags = function() {
+            return this.rawResult.hashtag;
         };
 
-        Sentence.prototype.hashtags = function() {
-            return this.rawSentence.hashtag;
+        Result.prototype.sensibilities = function() {
+            return this.rawResult.sensibilities;
         };
 
-        Sentence.prototype.topics = function() {
-            return this.rawSentence.topics;
+        Result.prototype.publicRetweetedUser = function() {
+            return this.pubrt();
         };
 
-        Sentence.prototype.reading = function() {
+        Result.prototype.repliedUser = function() {
+            return this.reply();
+        };
+
+        Result.prototype.mentionedUsers = function() {
+            return this.mention();
+        };
+
+        Result.prototype.containedUrls = function() {
+            return this.url();
+        };
+
+        Result.prototype.yomi = function() {
             var buffer = [];
-            this.phrases().forEach(function(eachPhrase) {
-                buffer.push(eachPhrase.reading());
+            this.morphemes().forEach(function(each) {
+                buffer.push(each.yomi());
             });
             return buffer.join('');
         };
 
-        Sentence.prototype.eachPhrase = function(callbackFunction) {
+        Result.prototype.impression = function() {
+            if (this.spn() == 0) { return '評価なし'; }
+            if (this.spn() == 1) { return 'ポジティブ'; }
+            if (this.spn() == 2) { return 'ネガティブ'; }
+            if (this.spn() == 3) { return '条件・期待'; }
+            if (this.spn() == 4) { return '依頼'; }
+
+            return 'Unknown';
+        };
+
+        Result.prototype.eachPhrase = function(callbackFunction) {
             this.phrases().forEach(function(each) {
                 callbackFunction(each);
             });
         };
 
-        Sentence.prototype.eachWord = function(callbackFunction) {
-            this.eachPhrase(function(eachPhrase) {
-                eachPhrase.eachWord(function(eachWord){
-                    callbackFunction(eachWord);
-                });
+        Result.prototype.eachMorpheme = function(callbackFunction) {
+            this.morphemes().forEach(function(each) {
+                callbackFunction(each);
             });
         };
 
-        Sentence.prototype.dependencies = function(callbackFunction) {
-            var self = this;
-            var result = [];
-
-            this.eachPhrase(function(eachPhrase) {
-                result.push([eachPhrase, self.phraseAt(eachPhrase.dependPhrase())]);
-            });
-
-            return result;
-        };
-
-        Sentence.prototype.phraseAt = function(phraseId) {
+        Result.prototype.phraseAt = function(phraseId) {
             for (var i = 0; i < this.phraseArray.length; i++) {
                 var eachPhrase = this.phraseArray[i];
 
@@ -187,122 +173,128 @@ var JoysoundJLP;
             return null;
         };
 
-        return Sentence;
+        Result.prototype.morphemeAt = function(morphemeId) {
+            for (var i = 0; i < this.morphemeArray.length; i++) {
+                var eachMorpheme = this.morphemeArray[i];
+
+                if (eachMorpheme.id() == morphemeId) {
+                    return eachMorpheme;
+                }
+            }
+            return null;
+        };
+
+        Result.prototype.printString = function() {
+            var buf = [];
+            this.eachMorpheme(function(each) {
+                buf.push(each.gokan());
+            });
+            return 'a Result (' + buf.join('') + ' [' + this.impression() + '])';
+        };
+
+        return Result;
     })();
-    JoysoundJLP.Sentence = Sentence;
+    JoysoundJLP.Result = Result;
 
 
     var Phrase = (function() {
         function Phrase(rawPhrase) {
             this.rawPhrase = rawPhrase;
-
-            this.phraseWordArray = [];
-            this.wordArray = [];
-
-            this.parse(rawPhrase);
-        };
-
-        Phrase.prototype.parse = function(rawPhrase) {
-            var self = this;
-
-            rawPhrase.phrase_word.forEach(function(eachRawPhraseWord) {
-                var phraseWord = new Word(eachRawPhraseWord);
-                self.phraseWordArray.push(phraseWord)
-            });
-
-            rawPhrase.words.forEach(function(eachRawWord) {
-                var word = new Word(eachRawWord);
-                self.wordArray.push(word)
-            });
-        };
-
-        Phrase.prototype.phraseWords = function() {
-            return this.phraseWordArray;
-        };
-
-        Phrase.prototype.words = function() {
-            return this.wordArray;
         };
 
         Phrase.prototype.id = function() {
-            return this.rawPhrase.id;
+            return this.pid();
         };
 
-        Phrase.prototype.isPositive = function() {
-            return this.rawPhrase.phrase_pn == 1;
+        Phrase.prototype.pid = function() {
+            return this.rawPhrase.pid;
         };
 
-        Phrase.prototype.isNegative = function() {
-            return this.rawPhrase.phrase_pn == 2;
+        Phrase.prototype.ppn = function() {
+            return this.rawPhrase.ppn;
         };
 
-        Phrase.prototype.isNeautral = function() {
-            return this.rawPhrase.phrase_pn == 0;
+        Phrase.prototype.did = function() {
+            return this.rawPhrase.did;
         };
 
-        Phrase.prototype.dependPhrase = function() {
-            return this.rawPhrase.depend_id;
+        Phrase.prototype.pairpn = function() {
+            return this.rawPhrase.pairpn;
         };
 
-        Phrase.prototype.isPositivePair = function() {
-            return this.rawPhrase.pair_phrase_pn == 1;
+        Phrase.prototype.deny = function() {
+            return this.rawPhrase.deny;
         };
 
-        Phrase.prototype.isNegativePair = function() {
-            return this.rawPhrase.pair_phrase_pn == 2;
+        Phrase.prototype.jshuushi = function() {
+            return this.rawPhrase.jshuushi;
         };
 
-        Phrase.prototype.isNeautralPair = function() {
-            return this.rawPhrase.pair_phrase_pn == 0;
+        Phrase.prototype.jgokan = function() {
+            return this.rawPhrase.jgokan;
         };
 
-        Phrase.prototype.modalities = function() {
-            return this.rawPhrase.modality;
+        Phrase.prototype.jhinshi = function() {
+            return this.rawPhrase.jhinshi;
         };
 
-        Phrase.prototype.reading = function() {
-            var buffer = [];
-            this.eachWord(function(eachWord) {
-                buffer.push(eachWord.reading());
-            });
-            buffer.push(' ');
-            return buffer.join('');
+        Phrase.prototype.jstart = function() {
+            return this.rawPhrase.jstart;
         };
 
-        Phrase.prototype.eachWord = function(callbackFunction) {
-            this.words().forEach(function(each) {
-                callbackFunction(each);
-            });
+        Phrase.prototype.jcount = function() {
+            return this.rawPhrase.jcount;
         };
 
-        Phrase.prototype.eachPhraseWord = function(callbackFunction) {
-            this.phraseWords().forEach(function(each) {
-                callbackFunction(each);
-            });
+        Phrase.prototype.jyomi = function() {
+            return this.rawPhrase.jyomi;
         };
 
-        Phrase.prototype.posinegaString = function() {
-            if (this.isPositive()) { return 'positive'; }
-            if (this.isNegative()) { return 'negative'; }
-            if (this.isNeautral()) { return 'neautral'; }
-            return '';
+        Phrase.prototype.fshuushi = function() {
+            return this.rawPhrase.fshuushi;
+        };
+
+        Phrase.prototype.fgokan = function() {
+            return this.rawPhrase.fgokan;
+        };
+
+        Phrase.prototype.fhinshi = function() {
+            return this.rawPhrase.fhinshi;
+        };
+
+        Phrase.prototype.fstart = function() {
+            return this.rawPhrase.fstart;
+        };
+
+        Phrase.prototype.fcount = function() {
+            return this.rawPhrase.fcount;
+        };
+
+        Phrase.prototype.fyomi = function() {
+            return this.rawPhrase.fyomi;
+        };
+
+        Phrase.prototype.impression = function() {
+            if (this.ppn() == 0) { return '評価なし'; }
+            if (this.ppn() == 1) { return 'ポジティブ'; }
+            if (this.ppn() == 2) { return 'ネガティブ'; }
+
+            return 'Unknown';
+        };
+
+        Phrase.prototype.impressionOfDependencyRelation = function() {
+            if (this.pairpn() == 0) { return '評価なし'; }
+            if (this.pairpn() == 1) { return 'ポジティブ'; }
+            if (this.pairpn() == 2) { return 'ネガティブ'; }
+
+            return 'Unknown';
         };
 
         Phrase.prototype.printString = function() {
-            var baseBuf = []
-            this.eachWord(function(each) {
-                baseBuf.push(each.word());
-            })
-
             var buf = [];
-            buf.push(baseBuf.join(''));
-            buf.push(this.posinegaString());
-            buf.push(this.id());
-            buf.push(this.dependPhrase());
-            buf.push(this.modalities());
-            buf.push(this.reading());
-
-            return 'a Phrase (' + buf.join(', ') + ')';
+            buf.push(this.jgokan() + this.fgokan());
+            buf.push(this.impression());
+            return 'a Phrase (' + buf.join('') + ')';
         };
 
         return Phrase;
@@ -310,87 +302,86 @@ var JoysoundJLP;
     JoysoundJLP.Phrase = Phrase;
 
 
-    var Word = (function() {
-        function Word(rawWord) {
-            this.rawWord = rawWord;
+    var Morpheme = (function() {
+        function Morpheme(rawMorpheme) {
+            this.rawMorpheme = rawMorpheme;
         };
 
-        Word.prototype.parse = function(rawWord) {
-            // noop
+        Morpheme.prototype.id = function() {
+            return this.mid();
         };
 
-        Word.prototype.word = function() {
-            return this.rawWord.word;
+        Morpheme.prototype.mid = function() {
+            return this.rawMorpheme.mid;
         };
 
-        Word.prototype.base = function() {
-            return this.rawWord.base == "" ? this.word(): this.rawWord.base;
+        Morpheme.prototype.pid = function() {
+            return this.rawMorpheme.pid;
         };
 
-        Word.prototype.startPosition = function() {
-            return this.rawWord.start;
+        Morpheme.prototype.shuushi = function() {
+            return this.rawMorpheme.shuushi;
         };
 
-        Word.prototype.byteLength = function() {
-            return this.rawWord.count;
+        Morpheme.prototype.gokan = function() {
+            return this.rawMorpheme.gokan;
         };
 
-        Word.prototype.attribute = function() {
-            switch (this.rawWord.attr) {
-                case '0': return '接頭辞';
-                case '1': return '自立語';
-                case '2': return '付属語';
-            }
-            return 'Unknown';
+        Morpheme.prototype.hinshi = function() {
+            return this.rawMorpheme.hinshi;
         };
 
-        Word.prototype.partsOfSpeech = function() {
-            return this.rawWord.pos;
+        Morpheme.prototype.start = function() {
+            return this.rawMorpheme.start;
         };
 
-        Word.prototype.reading = function() {
-            return this.rawWord.reading;
+        Morpheme.prototype.count = function() {
+            return this.rawMorpheme.count;
         };
 
-        Word.prototype.printString = function() {
+        Morpheme.prototype.yomi = function() {
+            return this.rawMorpheme.yomi;
+        };
+
+        Morpheme.prototype.attr = function() {
+            return this.rawMorpheme.attr;
+        };
+
+        Morpheme.prototype.printString = function() {
             var buf = [];
-            buf.push(this.word());
-            buf.push(this.base());
-            buf.push(this.startPosition());
-            buf.push(this.byteLength());
-            buf.push(this.attribute());
-            buf.push(this.partsOfSpeech());
-            buf.push(this.reading());
+            buf.push(this.gokan());
+            buf.push(this.hinshi());
+            buf.push(this.yomi());
 
-            return 'a Word (' + buf.join(', ') + ')';
+            return 'a Morpheme (' + buf.join(', ') + ')';
         };
 
-        return Word;
+        return Morpheme;
     })();
-    JoysoundJLP.Word = Word;
+    JoysoundJLP.Morpheme = Morpheme;
 
 
-    var Tagger = (function() {
-        function Tagger(aConfig) {
+    var Analyzer = (function() {
+        function Analyzer(aConfig) {
             this.config = aConfig;
         };
 
-        Tagger.prototype.parse = function(sentenceString, resultCallback) {
+        Analyzer.prototype.parse = function(sentenceString, resultCallback) {
             this.request(sentenceString, resultCallback);
         };
 
-        Tagger.prototype.parseAll = function(sentenceStrings, resultCallback) {
+        Analyzer.prototype.parseAll = function(sentenceStrings, resultCallback) {
             var joined = sentenceStrings.join('<!--p-->');
             this.request(joined, resultCallback);
         };
 
-        Tagger.prototype.parseRawResult = function(rawResult, resultCallback) {
+        Analyzer.prototype.parseRawResult = function(rawResult, resultCallback) {
             var resultSet = new ResultSet(rawResult, this.config);
             resultCallback(resultSet);
         };
 
-        Tagger.prototype.requestUrl = function(sentence) {
-            var url = this.config.requestUrl() + '?';
+        Analyzer.prototype.requestUrl = function(sentence) {
+            var url = this.config.requestUrl();
             if (this.config.hasMode()) {
                 url = url + 'mode=' + this.config.mode + '&';
             }
@@ -401,7 +392,7 @@ var JoysoundJLP;
             return url;
         };
 
-        Tagger.prototype.request = function(sentence, resultCallback) {
+        Analyzer.prototype.request = function(sentence, resultCallback) {
             var self = this;
 
             var url = this.requestUrl(sentence);
@@ -415,9 +406,9 @@ var JoysoundJLP;
             });
         };
 
-        return Tagger;
+        return Analyzer;
     })();
-    JoysoundJLP.Tagger = Tagger;
+    JoysoundJLP.Analyzer = Analyzer;
 
 })(JoysoundJLP || (JoysoundJLP = {}));
 

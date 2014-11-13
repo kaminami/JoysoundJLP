@@ -6,28 +6,29 @@ window.onload = function() {
         var twmodeEnabled = $("#example01-tw_mode:checked").val();
         var sourceSentence = $("#example01-input").val().trim();
 
-        var config = new JoysoundJLP.Config('YOUR_USERNAME', 'YOUR_PASSWORD');
+        var config = new JoysoundJLP.Config('!!!YOUR_ACCESSKEY!!!');
         if (twmodeEnabled) { config.beTweetMode() };
 
-        var tagger = new JoysoundJLP.Tagger(config);
+        var analyzer = new JoysoundJLP.Analyzer(config);
 
-        tagger.parse(sourceSentence, function(resultSet) {
-            var sentence = resultSet.first();
-            console.log(sentence);
-            console.log(sentence.dependencies())
+        analyzer.parse(sourceSentence, function(resultSet) {
+            var result = resultSet.results()[0];
+            console.log(result);
+            console.log(result.printString());
 
-            $("#example01-reading").text(sentence.reading());
+            $("#example01-reading").text(result.yomi());
 
             if (twmodeEnabled) {
-                addItemToTw("publicRetweetedUser", sentence.publicRetweetedUser());
-                addItemToTw("repliedUser", sentence.repliedUser());
-                addItemToTw("mentionedUsers", sentence.mentionedUsers());
-                addItemToTw("containedUrls", sentence.containedUrls());
-                addItemToTw("hashtags", sentence.hashtags());
+                addItemToTw("publicRetweetedUser", result.publicRetweetedUser());
+                addItemToTw("repliedUser", result.repliedUser());
+                addItemToTw("mentionedUsers", result.mentionedUsers());
+                addItemToTw("containedUrls", result.containedUrls());
+                addItemToTw("hashtags", result.hashtags());
             }
 
-            sentence.eachWord(function(eachWord) {
-                addItemToWords(eachWord.printString());
+            clearMorphemes();
+            result.eachMorpheme(function(morpheme) {
+                addItemToMorphemes(morpheme.printString());
             });
         });
 
@@ -35,8 +36,12 @@ window.onload = function() {
             $("#example01-tw").append($("<li>").text(key + ': ' + value).append($("</li>")));
         }
 
-        var addItemToWords = function(value) {
-            $("#example01-words").append($("<li>").text(value).append($("</li>")));
+        var addItemToMorphemes = function(value) {
+            $("#example01-morphemes").append($("<li>").text(value).append($("</li>")));
+        }
+
+        var clearMorphemes = function(value) {
+            $("#example01-morphemes").empty();
         }
     };
 }
