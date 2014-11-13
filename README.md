@@ -18,9 +18,9 @@ analyzer.analyze(sourceSentence, function(resultSet) {
     console.log(resultSet);
 
     var result = resultSet.results()[0];
-    console.log(resultSet.yomi());
+    console.log(result.yomi());
 
-    result.eachMorphems(function(each) {
+    result.eachMorphem(function(each) {
         console.log(each.printString())
     });
 });
