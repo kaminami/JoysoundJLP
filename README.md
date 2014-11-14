@@ -1,7 +1,8 @@
 JoysoundJLP
 ===========
 
-言語解析WebAPI (https://lr.capio.jp/services/webapis/) を利用するためのラッパーライブラリ。
+言語解析WebAPI (https://lr.capio.jp/services/webapis/) を利用するための薄いラッパーライブラリ。
+サードパーティ。
 
 ## Requirements
 * jQuery
