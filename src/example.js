@@ -11,7 +11,7 @@ window.onload = function() {
 
         var analyzer = new JoysoundJLP.Analyzer(config);
 
-        analyzer.parse(sourceSentence, function(resultSet) {
+        analyzer.analyze(sourceSentence, function(resultSet) {
             var result = resultSet.results()[0];
             console.log(result);
             console.log(result.printString());

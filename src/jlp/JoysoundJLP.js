@@ -134,10 +134,10 @@ var JoysoundJLP;
 
         Result.prototype.yomi = function() {
             var buffer = [];
-            this.morphemes().forEach(function(each) {
-                buffer.push(each.yomi());
+            this.eachPhrase(function(each) {
+                buffer.push(each.jyomi() + each.fyomi());
             });
-            return buffer.join('');
+            return buffer.join(' ');
         };
 
         Result.prototype.impression = function() {
@@ -366,16 +366,16 @@ var JoysoundJLP;
             this.config = aConfig;
         };
 
-        Analyzer.prototype.parse = function(sentenceString, resultCallback) {
+        Analyzer.prototype.analyze = function(sentenceString, resultCallback) {
             this.request(sentenceString, resultCallback);
         };
 
-        Analyzer.prototype.parseAll = function(sentenceStrings, resultCallback) {
+        Analyzer.prototype.analyzeAll = function(sentenceStrings, resultCallback) {
             var joined = sentenceStrings.join('<!--p-->');
             this.request(joined, resultCallback);
         };
 
-        Analyzer.prototype.parseRawResult = function(rawResult, resultCallback) {
+        Analyzer.prototype.handleRawResult = function(rawResult, resultCallback) {
             var resultSet = new ResultSet(rawResult, this.config);
             resultCallback(resultSet);
         };
@@ -401,7 +401,7 @@ var JoysoundJLP;
                 url: url,
                 dataType: 'jsonp',
                 success: function(rawResult){
-                    self.parseRawResult(rawResult, resultCallback)
+                    self.handleRawResult(rawResult, resultCallback)
                 }
             });
         };
