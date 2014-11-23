@@ -294,7 +294,7 @@ var JoysoundJLP;
             var buf = [];
             buf.push(this.jgokan() + this.fgokan());
             buf.push(this.impression());
-            return 'a Phrase (' + buf.join('') + ')';
+            return 'a Phrase (' + buf.join(', ') + ')';
         };
 
         return Phrase;
@@ -411,4 +411,3 @@ var JoysoundJLP;
     JoysoundJLP.Analyzer = Analyzer;
 
 })(JoysoundJLP || (JoysoundJLP = {}));
-
