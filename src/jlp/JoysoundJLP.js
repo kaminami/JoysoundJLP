@@ -14,8 +14,12 @@ var JoysoundJLP;
             return this.mode != undefined
         };
 
-        Config.prototype.requestUrl = function() {
+        Config.prototype.analyzeUrl = function() {
             return 'https://lr.capio.jp/webapis/iminos/synana_k/1_1?acckey=' + this.accessKey + '&';
+        };
+
+        Config.prototype.valuelistUrl = function() {
+            return 'https://lr.capio.jp/webapis/iminos/synana_k/1_1/valuelist?acckey=' + this.accessKey + '&';
         };
 
         return Config;
@@ -268,12 +272,16 @@ var JoysoundJLP;
         };
 
         Analyzer.prototype.analyze = function(sentenceString, resultCallback) {
-            this.request(sentenceString, resultCallback);
+            this.requestAnalyze(sentenceString, resultCallback);
         };
 
         Analyzer.prototype.analyzeAll = function(sentenceStrings, resultCallback) {
             var joined = sentenceStrings.join('<!--p-->');
-            this.request(joined, resultCallback);
+            this.requestAnalyze(joined, resultCallback);
+        };
+
+        Analyzer.prototype.getSensibilities = function(resultCallback) {
+            this.requestValuelist('sensibilities', resultCallback);
         };
 
         Analyzer.prototype.handleRawResult = function(rawResult, resultCallback) {
@@ -281,8 +289,8 @@ var JoysoundJLP;
             resultCallback(resultSet);
         };
 
-        Analyzer.prototype.requestUrl = function(sentence) {
-            var url = this.config.requestUrl();
+        Analyzer.prototype.analyzeUrl = function(sentence) {
+            var url = this.config.analyzeUrl();
             if (this.config.hasMode()) {
                 url = url + 'mode=' + this.config.mode + '&';
             }
@@ -293,16 +301,39 @@ var JoysoundJLP;
             return url;
         };
 
-        Analyzer.prototype.request = function(sentence, resultCallback) {
+        Analyzer.prototype.requestAnalyze = function(sentence, resultCallback) {
             var self = this;
 
-            var url = this.requestUrl(sentence);
+            var url = this.analyzeUrl(sentence);
             $.ajax({
                 type: 'GET',
                 url: url,
                 dataType: 'jsonp',
                 success: function(rawResult){
                     self.handleRawResult(rawResult, resultCallback)
+                }
+            });
+        };
+
+        Analyzer.prototype.handleValuelist = function(valuelist, resultCallback) {
+            resultCallback(valuelist);
+        };
+
+        Analyzer.prototype.valuelistUrl = function(valueType) {
+            var url = this.config.valuelistUrl() + "keyname=" + valueType;
+            return url;
+        }
+
+        Analyzer.prototype.requestValuelist = function(valueType, resultCallback) {
+            var self = this;
+
+            var url = this.valuelistUrl(valueType);
+            $.ajax({
+                type: 'GET',
+                url: url,
+                dataType: 'jsonp',
+                success: function(rawResult){
+                    self.handleValuelist(rawResult, resultCallback)
                 }
             });
         };
