@@ -4,6 +4,9 @@ JoysoundJLP
 言語解析WebAPI (https://lr.capio.jp/services/webapis/) を利用するための薄いラッパーライブラリ。
 サードパーティ。
 
+
+なお、サンプルプログラムを試す際は、言語解析WebAPI利用登録時に得られるAccessKeyで、example0x.jsを書き換える必要がある。
+
 ## Requirements
 * jQuery
 
