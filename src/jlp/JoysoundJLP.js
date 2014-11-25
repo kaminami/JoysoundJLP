@@ -25,28 +25,20 @@ var JoysoundJLP;
 
     var ResultSet = (function() {
         function ResultSet(rawResult, config) {
-            this.rawResult = rawResult;
+            this.apierr = rawResult.apierr;
+
             this.config = config;
-            this.resultArray = [];
+            this.results = [];
 
             this.parse(rawResult);
-
         };
 
         ResultSet.prototype.parse = function(rawResult) {
             var self = this;
             rawResult.results.forEach(function(eachRawResult) {
                 var sentence = new Result(eachRawResult);
-                self.resultArray.push(sentence)
+                self.results.push(sentence)
             });
-        };
-
-        ResultSet.prototype.results = function() {
-            return this.resultArray;
-        };
-
-        ResultSet.prototype.apierr = function() {
-            return this.rawResult.apierr;
         };
 
         return ResultSet;
@@ -56,9 +48,17 @@ var JoysoundJLP;
 
     var Result = (function() {
         function Result(rawResult) {
-            this.rawResult = rawResult;
-            this.phraseArray = [];
-            this.morphemeArray = [];
+            this.err = rawResult.err;
+            this.spn = rawResult.spn;
+            this.pubrt = rawResult.pubrt;
+            this.reply = rawResult.reply;
+            this.mention = rawResult.mention;
+            this.url = rawResult.url;
+            this.hashtags = rawResult.hashtags;
+            this.sensibilities = rawResult.sensibilities;
+
+            this.phrases = [];
+            this.morphemes = [];
 
             this.parse(rawResult)
         };
@@ -67,104 +67,64 @@ var JoysoundJLP;
             var self = this;
             rawResult.phrases.forEach(function(eachRawPhrase) {
                 var phrase = new Phrase(eachRawPhrase);
-                self.phraseArray.push(phrase)
+                self.phrases.push(phrase)
             });
 
             rawResult.morphemes.forEach(function(eachRawMorpheme) {
                 var morpheme = new Morpheme(eachRawMorpheme);
-                self.morphemeArray.push(morpheme)
+                self.morphemes.push(morpheme)
             });
         };
 
-        Result.prototype.phrases = function() {
-            return this.phraseArray;
-        };
-
-        Result.prototype.morphemes = function() {
-            return this.morphemeArray;
-        };
-
-        Result.prototype.err = function() {
-            return this.rawResult.err;
-        };
-
-        Result.prototype.spn = function() {
-            return this.rawResult.spn;
-        };
-
-        Result.prototype.pubrt = function() {
-            return this.rawResult.pubrt;
-        };
-
-        Result.prototype.reply = function() {
-            return this.rawResult.reply;
-        };
-
-        Result.prototype.mention = function() {
-            return this.rawResult.mention;
-        };
-
-        Result.prototype.url = function() {
-            return this.rawResult.url;
-        };
-
-        Result.prototype.hashtags = function() {
-            return this.rawResult.hashtag;
-        };
-
-        Result.prototype.sensibilities = function() {
-            return this.rawResult.sensibilities;
-        };
-
         Result.prototype.publicRetweetedUser = function() {
-            return this.pubrt();
+            return this.pubrt;
         };
 
         Result.prototype.repliedUser = function() {
-            return this.reply();
+            return this.reply;
         };
 
         Result.prototype.mentionedUsers = function() {
-            return this.mention();
+            return this.mention;
         };
 
         Result.prototype.containedUrls = function() {
-            return this.url();
+            return this.url;
         };
 
-        Result.prototype.yomi = function() {
+        Result.prototype.reading = function() {
             var buffer = [];
             this.eachPhrase(function(each) {
-                buffer.push(each.jyomi() + each.fyomi());
+                buffer.push(each.reading());
             });
             return buffer.join(' ');
         };
 
         Result.prototype.impression = function() {
-            if (this.spn() == 0) { return '評価なし'; }
-            if (this.spn() == 1) { return 'ポジティブ'; }
-            if (this.spn() == 2) { return 'ネガティブ'; }
-            if (this.spn() == 3) { return '条件・期待'; }
-            if (this.spn() == 4) { return '依頼'; }
+            if (this.spn == 0) { return '評価なし'; }
+            if (this.spn == 1) { return 'ポジティブ'; }
+            if (this.spn == 2) { return 'ネガティブ'; }
+            if (this.spn == 3) { return '条件・期待'; }
+            if (this.spn == 4) { return '依頼'; }
 
             return 'Unknown';
         };
 
         Result.prototype.eachPhrase = function(callbackFunction) {
-            this.phrases().forEach(function(each) {
+            this.phrases.forEach(function(each) {
                 callbackFunction(each);
             });
         };
 
         Result.prototype.eachMorpheme = function(callbackFunction) {
-            this.morphemes().forEach(function(each) {
+            this.morphemes.forEach(function(each) {
                 callbackFunction(each);
             });
         };
 
         Result.prototype.phraseAt = function(phraseId) {
-            for (var i = 0; i < this.phraseArray.length; i++) {
-                var eachPhrase = this.phraseArray[i];
+            for (var i = 0; i < this.phrases.length; i++) {
+                var eachPhrase = this.phrases[i];
 
                 if (eachPhrase.id() == phraseId) {
                     return eachPhrase;
@@ -174,8 +134,8 @@ var JoysoundJLP;
         };
 
         Result.prototype.morphemeAt = function(morphemeId) {
-            for (var i = 0; i < this.morphemeArray.length; i++) {
-                var eachMorpheme = this.morphemeArray[i];
+            for (var i = 0; i < this.morphemes.length; i++) {
+                var eachMorpheme = this.morphemes[i];
 
                 if (eachMorpheme.id() == morphemeId) {
                     return eachMorpheme;
@@ -187,7 +147,7 @@ var JoysoundJLP;
         Result.prototype.printString = function() {
             var buf = [];
             this.eachMorpheme(function(each) {
-                buf.push(each.gokan());
+                buf.push(each.gokan);
             });
             return 'a Result (' + buf.join('') + ' [' + this.impression() + '])';
         };
@@ -199,100 +159,65 @@ var JoysoundJLP;
 
     var Phrase = (function() {
         function Phrase(rawPhrase) {
-            this.rawPhrase = rawPhrase;
+            this.pid = rawPhrase.pid;
+            this.ppn = rawPhrase.ppn;
+            this.did = rawPhrase.did;
+            this.pairpn = rawPhrase.pairpn;
+            this.deny = rawPhrase.deny;
+            this.jshuushi = rawPhrase.jshuushi;
+            this.jgokan = rawPhrase.jgokan;
+            this.jhinshi = rawPhrase.jhinshi;
+            this.jstart = rawPhrase.jstart;
+            this.jcount = rawPhrase.jcount;
+            this.jyomi = rawPhrase.jyomi;
+            this.fshuushi = rawPhrase.fshuushi;
+            this.fgokan = rawPhrase.fgokan;
+            this.fhinshi = rawPhrase.fhinshi;
+            this.fstart = rawPhrase.fstart;
+            this.fcount = rawPhrase.fcount;
+            this.fyomi = rawPhrase.fyomi;
         };
 
         Phrase.prototype.id = function() {
-            return this.pid();
+            return this.pid;
         };
 
-        Phrase.prototype.pid = function() {
-            return this.rawPhrase.pid;
-        };
-
-        Phrase.prototype.ppn = function() {
-            return this.rawPhrase.ppn;
-        };
-
-        Phrase.prototype.did = function() {
-            return this.rawPhrase.did;
-        };
-
-        Phrase.prototype.pairpn = function() {
-            return this.rawPhrase.pairpn;
-        };
-
-        Phrase.prototype.deny = function() {
-            return this.rawPhrase.deny;
-        };
-
-        Phrase.prototype.jshuushi = function() {
-            return this.rawPhrase.jshuushi;
-        };
-
-        Phrase.prototype.jgokan = function() {
-            return this.rawPhrase.jgokan;
-        };
-
-        Phrase.prototype.jhinshi = function() {
-            return this.rawPhrase.jhinshi;
-        };
-
-        Phrase.prototype.jstart = function() {
-            return this.rawPhrase.jstart;
-        };
-
-        Phrase.prototype.jcount = function() {
-            return this.rawPhrase.jcount;
-        };
-
-        Phrase.prototype.jyomi = function() {
-            return this.rawPhrase.jyomi;
-        };
-
-        Phrase.prototype.fshuushi = function() {
-            return this.rawPhrase.fshuushi;
-        };
-
-        Phrase.prototype.fgokan = function() {
-            return this.rawPhrase.fgokan;
-        };
-
-        Phrase.prototype.fhinshi = function() {
-            return this.rawPhrase.fhinshi;
-        };
-
-        Phrase.prototype.fstart = function() {
-            return this.rawPhrase.fstart;
-        };
-
-        Phrase.prototype.fcount = function() {
-            return this.rawPhrase.fcount;
-        };
-
-        Phrase.prototype.fyomi = function() {
-            return this.rawPhrase.fyomi;
+        Phrase.prototype.reading = function() {
+            return this.jyomi + this.fyomi;
         };
 
         Phrase.prototype.impression = function() {
-            if (this.ppn() == 0) { return '評価なし'; }
-            if (this.ppn() == 1) { return 'ポジティブ'; }
-            if (this.ppn() == 2) { return 'ネガティブ'; }
+            if (this.ppn == 0) { return '評価なし'; }
+            if (this.ppn == 1) { return 'ポジティブ'; }
+            if (this.ppn == 2) { return 'ネガティブ'; }
 
             return 'Unknown';
         };
 
+
+        Phrase.prototype.isPositive = function() {
+            return this.ppn == 1;
+        }
+
+        Phrase.prototype.isNegative = function() {
+            return this.ppn == 2;
+        }
+
+        Phrase.prototype.isNeutral = function() {
+            return this.ppn == 0;
+        }
+
         Phrase.prototype.impressionOfDependencyRelation = function() {
-            if (this.pairpn() == 0) { return '評価なし'; }
-            if (this.pairpn() == 1) { return 'ポジティブ'; }
-            if (this.pairpn() == 2) { return 'ネガティブ'; }
+            if (this.pairpn == 0) { return '評価なし'; }
+            if (this.pairpn == 1) { return 'ポジティブ'; }
+            if (this.pairpn == 2) { return 'ネガティブ'; }
 
             return 'Unknown';
         };
 
         Phrase.prototype.printString = function() {
             var buf = [];
-            buf.push(this.jgokan() + this.fgokan());
+            buf.push(this.jgokan + this.fgokan);
             buf.push(this.impression());
             return 'a Phrase (' + buf.join(', ') + ')';
         };
@@ -304,54 +229,30 @@ var JoysoundJLP;
 
     var Morpheme = (function() {
         function Morpheme(rawMorpheme) {
-            this.rawMorpheme = rawMorpheme;
+            this.mid = rawMorpheme.mid;
+            this.pid = rawMorpheme.pid;
+            this.shuushi = rawMorpheme.shuushi;
+            this.gokan = rawMorpheme.gokan;
+            this.hinshi = rawMorpheme.hinshi;
+            this.start = rawMorpheme.start;
+            this.count = rawMorpheme.count;
+            this.yomi = rawMorpheme.yomi;
+            this.attr = rawMorpheme.attr;
         };
 
         Morpheme.prototype.id = function() {
-            return this.mid();
+            return this.mid;
         };
 
-        Morpheme.prototype.mid = function() {
-            return this.rawMorpheme.mid;
-        };
-
-        Morpheme.prototype.pid = function() {
-            return this.rawMorpheme.pid;
-        };
-
-        Morpheme.prototype.shuushi = function() {
-            return this.rawMorpheme.shuushi;
-        };
-
-        Morpheme.prototype.gokan = function() {
-            return this.rawMorpheme.gokan;
-        };
-
-        Morpheme.prototype.hinshi = function() {
-            return this.rawMorpheme.hinshi;
-        };
-
-        Morpheme.prototype.start = function() {
-            return this.rawMorpheme.start;
-        };
-
-        Morpheme.prototype.count = function() {
-            return this.rawMorpheme.count;
-        };
-
-        Morpheme.prototype.yomi = function() {
-            return this.rawMorpheme.yomi;
-        };
-
-        Morpheme.prototype.attr = function() {
-            return this.rawMorpheme.attr;
+        Morpheme.prototype.reading = function() {
+            return this.yomi;
         };
 
         Morpheme.prototype.printString = function() {
             var buf = [];
-            buf.push(this.gokan());
-            buf.push(this.hinshi());
-            buf.push(this.yomi());
+            buf.push(this.gokan);
+            buf.push(this.hinshi);
+            buf.push(this.yomi);
 
             return 'a Morpheme (' + buf.join(', ') + ')';
         };
