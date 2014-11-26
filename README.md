@@ -34,22 +34,22 @@ analyzer.analyze(sourceSentence, function(resultSet) {
         console.log(each.printString())
     });
     /*
-     a Phrase (今日は, 評価なし)
-     a Phrase (いい, ポジティブ)
-     a Phrase (天気だ, 評価なし)
-     */
+    a Phrase (今日は, 評価なし)
+    a Phrase (いい, ポジティブ)
+    a Phrase (天気だ, 評価なし)
+    */
 
     result.eachMorpheme(function(each) {
         console.log(each.printString())
     });
-     /*
-      a Morpheme (今日, 名詞, きょう)
-      a Morpheme (は, その他, は)
-      a Morpheme (い, 形容・形容動詞, い)
-      a Morpheme (い, その他, い)
-      a Morpheme (天気, 名詞, てんき)
-      a Morpheme (だ, その他, だ)
-      */
+    /*
+    a Morpheme (今日, 名詞, きょう)
+    a Morpheme (は, その他, は)
+    a Morpheme (い, 形容・形容動詞, い)
+    a Morpheme (い, その他, い)
+    a Morpheme (天気, 名詞, てんき)
+    a Morpheme (だ, その他, だ)
+    */
 });
 ```
 
