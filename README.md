@@ -21,6 +21,7 @@ var sourceSentence = "今日はいい天気だ";
 
 analyzer.analyze(sourceSentence, function(resultSet) {
     var result = resultSet.results[0];
+
     console.log(result.impression());
     // ポジティブ
 
